@@ -47,8 +47,9 @@ import org.apache.nifi.processor.util.StandardValidators;
 @SeeAlso(classNames = {
     "org.apache.nifi.processors.standard.HandleHttpRequest",
     "org.apache.nifi.processors.standard.HandleHttpResponse"})
-@CapabilityDescription("Provides the ability to store and retrieve HTTP requests and responses external to a Processor, so that "
-        + "multiple Processors can interact with the same HTTP request.")
+//@CapabilityDescription("Provides the ability to store and retrieve HTTP requests and responses external to a Processor, so that "
+//        + "multiple Processors can interact with the same HTTP request.")
+@CapabilityDescription("提供了存储和检索处理器外部HTTP请求和响应的能力，因此多个处理器可以与同一HTTP请求进行交互")
 public class StandardHttpContextMap extends AbstractControllerService implements HttpContextMap {
 
     public static final PropertyDescriptor MAX_OUTSTANDING_REQUESTS = new PropertyDescriptor.Builder()

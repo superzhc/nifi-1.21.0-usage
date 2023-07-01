@@ -609,9 +609,9 @@ public class InvokeHTTPTest {
     public void testRunGetHttp302CookieStrategyAcceptAll() throws InterruptedException {
         runner.setProperty(InvokeHTTP.RESPONSE_COOKIE_STRATEGY, CookieStrategy.ACCEPT_ALL.name());
         mockWebServer.enqueue(new MockResponse().setResponseCode(HTTP_MOVED_TEMP)
-            .addHeader(SET_COOKIE_HEADER, COOKIE_1)
-            .addHeader(SET_COOKIE_HEADER, COOKIE_2)
-            .addHeader(LOCATION_HEADER, getMockWebServerUrl()));
+                .addHeader(SET_COOKIE_HEADER, COOKIE_1)
+                .addHeader(SET_COOKIE_HEADER, COOKIE_2)
+                .addHeader(LOCATION_HEADER, getMockWebServerUrl()));
         enqueueResponseCodeAndRun(HTTP_OK);
 
         RecordedRequest request1 = mockWebServer.takeRequest();
@@ -629,9 +629,9 @@ public class InvokeHTTPTest {
     @Test
     public void testRunGetHttp302CookieStrategyDefaultDisabled() throws InterruptedException {
         mockWebServer.enqueue(new MockResponse().setResponseCode(HTTP_MOVED_TEMP)
-            .addHeader(SET_COOKIE_HEADER, COOKIE_1)
-            .addHeader(SET_COOKIE_HEADER, COOKIE_2)
-            .addHeader(LOCATION_HEADER, getMockWebServerUrl()));
+                .addHeader(SET_COOKIE_HEADER, COOKIE_1)
+                .addHeader(SET_COOKIE_HEADER, COOKIE_2)
+                .addHeader(LOCATION_HEADER, getMockWebServerUrl()));
         enqueueResponseCodeAndRun(HTTP_OK);
 
         RecordedRequest request1 = mockWebServer.takeRequest();
@@ -820,26 +820,26 @@ public class InvokeHTTPTest {
 
     private static Stream<Arguments> testResponseFlowFileFilenameExtractedFromRemoteUrl() {
         return Stream.of(
-            Arguments.of(HttpMethod.GET.name(), "file", "file"),
-            Arguments.of(HttpMethod.GET.name(), "file/", "file"),
-            Arguments.of(HttpMethod.GET.name(), "file.txt", "file.txt"),
-            Arguments.of(HttpMethod.GET.name(), "file.txt/", "file.txt"),
-            Arguments.of(HttpMethod.GET.name(), "file.txt/?qp=v", "file.txt"),
-            Arguments.of(HttpMethod.GET.name(), "f%69%6Cle.txt", "f%69%6Cle.txt"),
-            Arguments.of(HttpMethod.GET.name(), "path/to/file.txt", "file.txt"),
-            Arguments.of(HttpMethod.GET.name(), "", FLOW_FILE_INITIAL_FILENAME),
-            Arguments.of(HttpMethod.POST.name(), "has/path", FLOW_FILE_INITIAL_FILENAME),
-            Arguments.of(HttpMethod.POST.name(), "", FLOW_FILE_INITIAL_FILENAME),
-            Arguments.of(HttpMethod.PUT.name(), "has/path", FLOW_FILE_INITIAL_FILENAME),
-            Arguments.of(HttpMethod.PUT.name(), "", FLOW_FILE_INITIAL_FILENAME),
-            Arguments.of(HttpMethod.PATCH.name(), "", FLOW_FILE_INITIAL_FILENAME),
-            Arguments.of(HttpMethod.PATCH.name(), "has/path", FLOW_FILE_INITIAL_FILENAME),
-            Arguments.of(HttpMethod.DELETE.name(), "", FLOW_FILE_INITIAL_FILENAME),
-            Arguments.of(HttpMethod.DELETE.name(), "has/path", FLOW_FILE_INITIAL_FILENAME),
-            Arguments.of(HttpMethod.HEAD.name(), "", FLOW_FILE_INITIAL_FILENAME),
-            Arguments.of(HttpMethod.HEAD.name(), "has/path", FLOW_FILE_INITIAL_FILENAME),
-            Arguments.of(HttpMethod.OPTIONS.name(), "", FLOW_FILE_INITIAL_FILENAME),
-            Arguments.of(HttpMethod.OPTIONS.name(), "has/path", FLOW_FILE_INITIAL_FILENAME)
+                Arguments.of(HttpMethod.GET.name(), "file", "file"),
+                Arguments.of(HttpMethod.GET.name(), "file/", "file"),
+                Arguments.of(HttpMethod.GET.name(), "file.txt", "file.txt"),
+                Arguments.of(HttpMethod.GET.name(), "file.txt/", "file.txt"),
+                Arguments.of(HttpMethod.GET.name(), "file.txt/?qp=v", "file.txt"),
+                Arguments.of(HttpMethod.GET.name(), "f%69%6Cle.txt", "f%69%6Cle.txt"),
+                Arguments.of(HttpMethod.GET.name(), "path/to/file.txt", "file.txt"),
+                Arguments.of(HttpMethod.GET.name(), "", FLOW_FILE_INITIAL_FILENAME),
+                Arguments.of(HttpMethod.POST.name(), "has/path", FLOW_FILE_INITIAL_FILENAME),
+                Arguments.of(HttpMethod.POST.name(), "", FLOW_FILE_INITIAL_FILENAME),
+                Arguments.of(HttpMethod.PUT.name(), "has/path", FLOW_FILE_INITIAL_FILENAME),
+                Arguments.of(HttpMethod.PUT.name(), "", FLOW_FILE_INITIAL_FILENAME),
+                Arguments.of(HttpMethod.PATCH.name(), "", FLOW_FILE_INITIAL_FILENAME),
+                Arguments.of(HttpMethod.PATCH.name(), "has/path", FLOW_FILE_INITIAL_FILENAME),
+                Arguments.of(HttpMethod.DELETE.name(), "", FLOW_FILE_INITIAL_FILENAME),
+                Arguments.of(HttpMethod.DELETE.name(), "has/path", FLOW_FILE_INITIAL_FILENAME),
+                Arguments.of(HttpMethod.HEAD.name(), "", FLOW_FILE_INITIAL_FILENAME),
+                Arguments.of(HttpMethod.HEAD.name(), "has/path", FLOW_FILE_INITIAL_FILENAME),
+                Arguments.of(HttpMethod.OPTIONS.name(), "", FLOW_FILE_INITIAL_FILENAME),
+                Arguments.of(HttpMethod.OPTIONS.name(), "has/path", FLOW_FILE_INITIAL_FILENAME)
         );
     }
 
@@ -1039,5 +1039,33 @@ public class InvokeHTTPTest {
             throw new IllegalArgumentException("Socket Factory not found");
         }
         mockWebServer.useHttps(sslSocketFactory, false);
+    }
+
+    @Test
+    public void test20230630() throws Exception {
+        runner.setNonLoopConnection(false);
+
+        runner.setProperty(InvokeHTTP.HTTP_METHOD, HttpMethod.GET.name());
+        runner.setProperty(InvokeHTTP.HTTP_URL, "http://post.smzdm.com/feed");
+//        runner.setProperty(InvokeHTTP.RESPONSE_BODY_ATTRIBUTE_NAME, "response");
+
+        runner.run();
+
+        List<MockFlowFile> originalFlowFiles = runner.getFlowFilesForRelationship(InvokeHTTP.ORIGINAL);
+        if (null != originalFlowFiles && originalFlowFiles.size() > 0) {
+            MockFlowFile originalFlowFile = originalFlowFiles.get(0);
+            for (Map.Entry<String, String> attr : originalFlowFile.getAttributes().entrySet()) {
+                System.out.println(String.format("属性名称：[%s]，属性值：[%s]", attr.getKey(), attr.getValue()));
+            }
+            System.out.println(originalFlowFile.getContent());
+        }
+
+        System.out.println("==================================华丽分割线==================================");
+
+        MockFlowFile responseFlowFile = runner.getFlowFilesForRelationship(InvokeHTTP.RESPONSE).get(0);
+        for (Map.Entry<String, String> attr : responseFlowFile.getAttributes().entrySet()) {
+            System.out.println(String.format("属性名称：[%s]，属性值：[%s]", attr.getKey(), attr.getValue()));
+        }
+        System.out.println(responseFlowFile.getContent());
     }
 }

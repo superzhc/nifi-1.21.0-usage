@@ -43,6 +43,7 @@
         <module>nifi-manifest</module>
         <module>c2</module>
         <module>nifi-h2</module>
+        <module>nifi-third-nar-bundles</module>
     </modules>
     <url>https://nifi.apache.org</url>
     <organization>

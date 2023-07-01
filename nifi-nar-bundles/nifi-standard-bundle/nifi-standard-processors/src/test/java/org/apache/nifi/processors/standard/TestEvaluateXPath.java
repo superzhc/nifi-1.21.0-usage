@@ -213,4 +213,9 @@ public class TestEvaluateXPath {
 
         testRunner.assertAllFlowFilesTransferred(EvaluateXPath.REL_FAILURE, 1);
     }
+
+    public void test20230701() throws Exception{
+        TestRunner runner=TestRunners.newTestRunner(new EvaluateXPath());
+
+    }
 }

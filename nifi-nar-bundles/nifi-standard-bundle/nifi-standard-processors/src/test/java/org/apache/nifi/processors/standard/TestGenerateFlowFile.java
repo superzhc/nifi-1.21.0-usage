@@ -73,4 +73,23 @@ public class TestGenerateFlowFile {
         generatedFlowFile.assertAttributeEquals("mime.type", "application/text");
     }
 
+    @Test
+    public void test20230630() {
+        TestRunner runner = TestRunners.newTestRunner(new GenerateFlowFile());
+        runner.setProperty(GenerateFlowFile.FILE_SIZE, "0B");
+        runner.setProperty(GenerateFlowFile.DATA_FORMAT, GenerateFlowFile.DATA_FORMAT_TEXT);
+        runner.setProperty(GenerateFlowFile.CUSTOM_TEXT, "{\n" +
+                "\"startUpdateDate\":\"${now():format(\"yyyy-MM-dd\")}\",\n" +
+                "\"startUpdateTime\":\"${now():minus(3600000):format(\"HH:mm:ss\")}\",\n" +
+                "\"endUpdateDate\":\"${now():format(\"yyyy-MM-dd\")}\",\n" +
+                "\"endUpdateTime\":\"${now():format(\"HH:mm:ss\")}\",\n" +
+                "\"taskStatus\":0\n" +
+                "}");
+
+        runner.run();
+
+        // 获取生成的随机文件内容
+        MockFlowFile generatedFlowFile = runner.getFlowFilesForRelationship(GenerateFlowFile.SUCCESS).get(0);
+        System.out.println(generatedFlowFile.getContent());
+    }
 }

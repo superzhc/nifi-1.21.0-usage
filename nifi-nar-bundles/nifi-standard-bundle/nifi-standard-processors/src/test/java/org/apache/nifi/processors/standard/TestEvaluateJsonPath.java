@@ -32,6 +32,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -415,5 +416,39 @@ class TestEvaluateJsonPath {
         testRunner.assertAllFlowFilesTransferred(expectedRel, 1);
         final MockFlowFile out = testRunner.getFlowFilesForRelationship(expectedRel).get(0);
         assertNotNull(out.getAttribute(jsonPathControlCharKey), "Transferred flow file did not have the correct result for id attribute");
+    }
+
+    @Test
+    public void test20230630() throws Exception {
+        String content = "{\n" +
+                "\"startUpdateDate\":\"2023-06-30\",\n" +
+                "\"startUpdateTime\":\"13:41:34\",\n" +
+                "\"endUpdateDate\":\"2023-06-30\",\n" +
+                "\"endUpdateTime\":\"14:41:34\",\n" +
+                "\"taskStatus\":0\n" +
+                "}";
+
+        TestRunner runner = TestRunners.newTestRunner(new EvaluateJsonPath());
+        runner.setProperty(EvaluateJsonPath.DESTINATION, EvaluateJsonPath.DESTINATION_ATTRIBUTE);
+        runner.setProperty(EvaluateJsonPath.RETURN_TYPE, EvaluateJsonPath.RETURN_TYPE_AUTO);
+        runner.setProperty(EvaluateJsonPath.PATH_NOT_FOUND, EvaluateJsonPath.PATH_NOT_FOUND_IGNORE);
+        runner.setProperty(EvaluateJsonPath.NULL_VALUE_DEFAULT_REPRESENTATION, EvaluateJsonPath.EMPTY_STRING_OPTION);
+        // 设置动态属性
+        runner.setProperty("endUpdateDate", "$.endUpdateDate");
+        runner.setProperty("endUpdateTime", "$.endUpdateTime");
+        runner.setProperty("startUpdateDate", "$.startUpdateDate");
+        runner.setProperty("startUpdateTime", "$.startUpdateTime");
+        runner.setProperty("taskStatus", "$.taskStatus");
+
+        // 插入字符串数据
+        runner.enqueue(content);
+
+        runner.run();
+
+        MockFlowFile flowFile = runner.getFlowFilesForRelationship(EvaluateJsonPath.REL_MATCH).get(0);
+        System.out.println("FlowFile文件内容：" + flowFile.getContent());
+        for (Map.Entry<String, String> attr : flowFile.getAttributes().entrySet()) {
+            System.out.println(attr.getKey() + ":" + attr.getValue());
+        }
     }
 }
